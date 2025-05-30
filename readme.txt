@@ -29,6 +29,7 @@ A companion plugin that enhances and extends the functionality of the Cornerston
   - Blinking tab title ("Inactive Timeout") to warn inactive users while on other tabs.
   - Configurable timeout duration.
   - Optionally disable saving changes when forcibly booting users.
+- **File Element:** Integrates with the ERI File Library plugin by adding a new File element.
 
 **Cornerstone must be installed and active for this plugin to work.**
 

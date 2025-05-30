@@ -100,7 +100,7 @@ class File {
 
         // The args
         $args = [
-            'title'    => __( 'CS Companion: File', 'cornerstone-companion' ),
+            'title'    => __( 'File', 'cornerstone-companion' ),
             // 'icon' => '<svg>/* your SVG code */</svg>', // Let's make one and add it globally for all elements
             'values'   => $values,
             'builder'  => [ $this, 'builder' ],
