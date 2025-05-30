@@ -1,0 +1,32 @@
+/* Hide Classes */
+.hide {
+	display: none;
+}
+
+/* Show Hidden Classes */
+.tco-preview .hide {
+	display: revert !important;
+	background-color: #ccc;
+	opacity: 0.8;
+	background: repeating-linear-gradient( -45deg, #b1b1b4, #b1b1b4 5px, #ccc 5px, #ccc 25px );
+}
+
+/* Edit Lock */
+#cscompanion-exit {
+	background: #777;
+	color: #fff;
+}
+
+#cscompanion-continue {
+	background: #d63638;
+	color: #fff;
+}
+
+#cscompanion-lock-modal button {
+    margin: 0 10px;
+}
+
+#cscompanion-lock-modal button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}

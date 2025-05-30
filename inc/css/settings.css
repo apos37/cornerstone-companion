@@ -1,0 +1,207 @@
+/* Wrappers */
+.wrap {
+	margin: 0;
+}
+
+.cscompanion-settings-wrapper {
+	display: flex;
+    justify-content: space-between;
+    gap: 1.5em;
+	padding: 1.5em;
+	margin: 0 0 0 -20px;
+}
+
+/* Sections */
+.cscompanion-box-sections {
+	width: 100%;
+}
+
+.cscompanion-box-row {
+	width: 100%;
+	background-color: #fff;
+    box-shadow: 0 1px 4px #0000001a;
+	margin-bottom: 2rem;
+}
+
+.cscompanion-column {
+    width: 100%;
+    margin: 0 0 1.5em;
+}
+
+.cscompanion-box-header {
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+    background-color: #fff;
+    box-shadow: 0 1px 4px #0001;
+}
+
+.cscompanion-box-header h2 {
+    overflow: hidden;
+    height: 4em;
+    margin: 0;
+    padding: 0 1.2658227848em;
+    font-size: 1.185em;
+    font-weight: 600;
+    line-height: 4em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cscompanion-box-content {
+    padding: 1.5em;
+}
+
+.cscompanion-box-content.has-fields {
+	display: flex;
+	gap: 1rem;
+}
+
+.cscompanion-box-left {
+	vertical-align: top;
+	width: 20em;
+}
+
+.cscompanion-box-left label {
+	font-weight: 600;
+	font-size: .925em;
+}
+
+.cscompanion-box-desc {
+	line-height: 1.6;
+    opacity: .5;
+	font-size: .925em;
+	margin-bottom: 0;
+}
+
+.cscompanion-box-right {
+    vertical-align: top;
+    width: calc(100% - 20em);
+}
+
+/* Sidebar */
+.cscompanion-sidebar {
+	max-width: 23em;
+}
+
+.cscompanion-sidebar p {
+	line-height: 1.6;
+	margin: 0 0 1.5em;
+}
+
+.cscompanion-sidebar .submit {
+	margin: 0;
+	padding: 0;
+}
+
+.cscompanion-sidebar #submit {
+	margin: 0;
+    border: 0;
+    border-style: solid;
+    border-color: #7f7f7f;
+    border-bottom-width: .315em;
+    padding: 1.15em 1.42em 1.15em 1.485em;
+    font-size: .85em;
+    font-weight: 600;
+    letter-spacing: .065em;
+    line-height: 1.2;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #fff !important;
+    background-color: #9e9e9e;
+    border-radius: .45em;
+    transition: border-color .3s ease, background-color .3s ease;
+    cursor: pointer;
+	width: 100%;
+}
+
+.cscompanion-sidebar #submit:hover, 
+.cscompanion-sidebar #submit:focus, 
+.cscompanion-sidebar #submit:active {
+    background-color: #ababab;
+    box-shadow: none;
+    outline: none;
+}
+
+/* Fields */
+.cscompanion-settings-wrapper input[type="text"],
+.cscompanion-settings-wrapper input[type="number"] {
+	padding: 1em .75em;
+	display: block;
+    width: 100%;
+    height: 3em !important;
+    margin: 0;
+    border: 1px solid #d5d5d5;
+    font-size: 1em !important;
+    font-weight: 600;
+    line-height: normal;
+    color: #23282d;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: inset 0 1px 2px #0000001a;
+    transition: none;
+	min-height: 30px;
+	max-width: 35em;
+}
+
+.cscompanion-settings-wrapper input[type="text"]:focus,
+.cscompanion-settings-wrapper input[type="number"]:focus {
+	border-color: #d5d5d5;
+    box-shadow: inset 0 1px 2px #0000001a, 0 0 0 .2em #fff, 0 0 0 .35em #d5d5d5bf;
+    outline: none;
+}
+
+.cscompanion-toggle {
+	display: block;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	font-size: 1em;
+	font-weight: 400;
+	line-height: 1;
+	color: #c5c5c5;
+	background-color: transparent;
+	cursor: pointer;
+	outline: 0;
+}
+
+.cscompanion-toggle input {
+	display: none;
+}
+
+.cscompanion-toggle span {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.cscompanion-toggle .label {
+	font-size: 1.15em;
+	color: #23282d;
+	font-weight: 600;
+	opacity: 1;
+}
+
+.cscompanion-toggle input[type="checkbox"]:not(:checked) ~ span .label {
+	opacity: 0.5;
+}
+
+.cscompanion-toggle svg {
+	display: block;
+	width: 1.5em;
+	height: 1.5em;
+	font-size: 1em;
+	stroke: currentColor;
+	margin: 0 .5em 0 0;
+}
+
+.cscompanion-toggle svg:hover {
+	color: #000000;
+}
+
+.cscompanion-toggle input:checked + span {
+	color: #2ecc71;
+}
+
+.cscompanion-box-content.not-applicable {
+	display: none;
+}

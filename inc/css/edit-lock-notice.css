@@ -1,0 +1,28 @@
+/* Edit Lock Notice */
+#cscompanion-lock-notice {
+	background-image: repeating-linear-gradient(
+		-45deg,
+		#870927,
+		#870927 10px,
+		darkred 10px,
+		darkred 20px
+	);
+	background-size: 56.57px 56.57px;
+	background-position: 0 0;
+	animation: cscompanion-stripe-move 3s linear infinite;
+}
+
+@keyframes cscompanion-stripe-move {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 56.57px 0;
+	}
+}
+
+#cscompanion-lock-notice p {
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}

@@ -1,0 +1,65 @@
+/* Lock Modal Overlay */
+#cscompanion-lock-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.85);
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Lock Modal */
+#cscompanion-lock-modal {
+	background: #151515;
+	color: #fff;
+	padding: 2em;
+	max-width: 600px;
+	width: 90%;
+	text-align: center;
+	border-radius: 8px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+	font-family: sans-serif;
+}
+
+/* Prevent interaction with rest of page */
+/* body > *:not(#cscompanion-lock-overlay) {
+	pointer-events: none !important;
+	user-select: none !important;
+} */
+
+/* Lock Modal Content */
+#cscompanion-lock-modal h2 {
+	margin-top: 0;
+}
+
+#cscompanion-lock-modal p {
+	font-size: 1rem;
+	margin: 1em 0;
+}
+
+#cscompanion-lock-modal .cscompanion-lock-buttons {
+	margin-top: 2em;
+}
+
+#cscompanion-lock-modal button {
+	padding: 0.5em 1.5em;
+	border: none;
+	border-radius: 4px;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+#cscompanion-go-back {
+	background: #777;
+	color: #fff;
+	margin-right: 1em;
+}
+
+#cscompanion-take-over {
+	background: #d63638;
+	color: #fff;
+}
