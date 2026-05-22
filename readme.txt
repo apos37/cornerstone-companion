@@ -1,10 +1,10 @@
 === Cornerstone Companion ===
 Contributors: apos37
 Tags: cornerstone, theme co, enhancements, add-ons, extended
-Requires at least: 5.9
-Tested up to: 6.8
-Requires PHP: 7.4
-Stable tag: 1.0.1
+Requires at least: 6.0
+Tested up to: 7.0
+Requires PHP: 8.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -54,5 +54,12 @@ Yes, there are filter hooks and internal settings available to adjust the timeou
 Yes. The dashboard banner includes the timestamp of last activity (render event) so you can judge whether the session is stale.
 
 == Changelog ==
+= 1.0.2 =
+* Compatibility: Increased minimum required WordPress version to 6.0
+* Compatibility: Increased minimum required PHP version to 8.0
+* Compatibility: Tested with WordPress 7.0
+* Update: Added uninstall cleanup option
+* Tweak: Added a "saved" confirmation notice when settings are saved
+
 = 1.0.1 =
 * Initial Release on May 15, 2025

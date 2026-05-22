@@ -3,29 +3,12 @@
  * Version check, activation, deactivation, uninstallation, etc.
  */
 
+namespace PluginRx\CornerstoneCompanion;
 
-/**
- * Define Namespaces
- */
-namespace Apos37\CornerstoneCompanion;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-
-/**
- * Exit if accessed directly.
- */
-if ( !defined( 'ABSPATH' ) ) exit;
-
-
-/**
- * Instantiate the class
- */
-new Common();
-
-
-/**
- * The class
- */
 class Common {
+
 
     /**
      * Constructor
@@ -37,6 +20,9 @@ class Common {
 
 		// Cornerstone check
 		$this->check_cornerstone_dependency();
+
+		// Check for updates
+		add_action( 'plugins_loaded', [ $this, 'check_for_updates' ] );
         
     } // End __construct()
 
@@ -110,4 +96,26 @@ class Common {
 		}
 	} // End check_cornerstone_dependency()
 
+
+	/**
+     * Check for plugin updates
+     */
+    public function check_for_updates() : void {
+        require_once __DIR__ . '/inc/updater.php';
+
+        $args = [
+            'name'            => cscompanion_plugin_data( 'name' ),
+            'text_domain'     => cscompanion_plugin_data( 'textdomain' ),
+            'basename'        => cscompanion_plugin_data( 'basename' ),
+            'version'         => cscompanion_plugin_data( 'version' ),
+            'author_uri'      => cscompanion_plugin_data( 'author_uri' ),
+            'plugin_uri'      => cscompanion_plugin_data( 'plugin_uri' ),
+            'prefix'          => 'css_organizer',
+        ];
+        new Updater( $args );
+    } // End check_for_updates()
+
 }
+
+
+new Common();

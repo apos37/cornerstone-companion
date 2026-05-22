@@ -7,7 +7,7 @@
 /**
  * Define Namespaces
  */
-namespace Apos37\CornerstoneCompanion;
+namespace PluginRx\CornerstoneCompanion;
 
 
 /**

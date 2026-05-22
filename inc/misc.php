@@ -7,8 +7,8 @@
 /**
  * Define Namespaces
  */
-namespace Apos37\CornerstoneCompanion;
-use Apos37\CornerstoneCompanion\Helpers;
+namespace PluginRx\CornerstoneCompanion;
+use PluginRx\CornerstoneCompanion\Helpers;
 
 
 /**

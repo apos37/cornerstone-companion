@@ -7,8 +7,8 @@
 /**
  * Define Namespaces
  */
-namespace Apos37\CornerstoneCompanion;
-use Apos37\CornerstoneCompanion\Helpers;
+namespace PluginRx\CornerstoneCompanion;
+use PluginRx\CornerstoneCompanion\Helpers;
 
 /**
  * Exit if accessed directly.
@@ -35,6 +35,7 @@ class EditLock {
 	 * @var string
 	 */
 	private $option_key_editing = 'cscompanion_edit_lock_all';
+	private $option_key_global = 'cscompanion_global_edit_lock';
 	private $option_key_since = 'cscompanion_edit_lock_since';
 	private $option_key_takeover = 'cscompanion_edit_lock_takeover';
 
@@ -155,6 +156,16 @@ class EditLock {
 
 
 	/**
+	 * Checks if we should be locking the editor globally
+	 *
+	 * @return boolean
+	 */
+	public function should_lock_editor_globally() {
+		return filter_var( get_option( $this->option_key_global, true ), FILTER_VALIDATE_BOOLEAN );
+	} // End should_lock_editor_globally()
+
+
+	/**
 	 * Check if any Cornerstone editor is globally locked by another user
 	 *
 	 * @param int $timeout
@@ -168,14 +179,14 @@ class EditLock {
 
 		list( $time, $user_id, $post_id ) = explode( ':', $lock );
 
-		$time     = absint( $time );
-		$user_id  = absint( $user_id );
-		$post_id  = absint( $post_id );
+		$time    = absint( $time );
+		$user_id = absint( $user_id );
+		$post_id = absint( $post_id );
 
 		if ( $bypass_checks ) {
 			return [
-				'user' => $user_id,
-				'post' => $post_id
+				'user'   => $user_id,
+				'post'   => $post_id
 			];
 		}
 
@@ -184,8 +195,8 @@ class EditLock {
 
 		if ( $user_id && $user_id !== $current && ( $now - $time ) < $this->timeout ) {
 			return [
-				'user' => $user_id,
-				'post' => $post_id
+				'user'   => $user_id,
+				'post'   => $post_id
 			];
 		}
 
@@ -358,33 +369,38 @@ class EditLock {
 		$lock = $this->check_lock_all_cornerstone_editors();
 
 		if ( $lock ) {
-			$user_id = $lock[ 'user' ];
-			$user    = get_userdata( $user_id );
-			$name    = $user ? esc_html( $user->display_name ) : __( 'Another user', 'cornerstone-companion' );
 
-			$response[ 'cscompanion_lock_notice' ] = sprintf(
-				/* translators: %s: display name of the user editing */
-				__( '%s is currently editing in Cornerstone.', 'cornerstone-companion' ),
-				$name
-			);
+			if ( $this->should_lock_editor_globally() ) {
+				$user_id = $lock[ 'user' ];
+				$user    = get_userdata( $user_id );
+				$name    = $user ? esc_html( $user->display_name ) : __( 'Another user', 'cornerstone-companion' );
 
-			$since = $this->get_since();
-			if ( $since ) {
-				$start_local    = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $since[ 'start' ] ), 'M jS @ g:ia' );
-				$rendered_local = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $since[ 'rendered' ] ), 'M jS @ g:ia' );
-
-				/* translators: 1: start time, 2: last rendered time */
-				$response[ 'cscompanion_lock_notice' ] .= ' ' . sprintf(
-					// Translators: 1 = human-readable time the lock started, 2 = human-readable time the lock was last rendered.
-					__( '(Started %1$s | Last rendered %2$s)', 'cornerstone-companion' ),
-					$start_local,
-					$rendered_local
+				$response[ 'cscompanion_lock_notice' ] = sprintf(
+					/* translators: display name of the user editing */
+					__( '%s is currently editing in Cornerstone.', 'cornerstone-companion' ),
+					$name
 				);
+
+				$since = $this->get_since();
+				if ( $since ) {
+					$start_local    = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $since[ 'start' ] ), 'F jS @ g:ia' );
+					$rendered_local = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $since[ 'rendered' ] ), 'F jS @ g:ia' );
+
+					/* translators: 1: start time, 2: last rendered time */
+					$response[ 'cscompanion_lock_notice' ] .= ' ' . sprintf(
+						// Translators: 1 = human-readable time the lock started, 2 = human-readable time the lock was last rendered.
+						__( '(Started %1$s | Last rendered %2$s)', 'cornerstone-companion' ),
+						$start_local,
+						$rendered_local
+					);
+				}
+			} else {
+				$response[ 'cscompanion_lock_notice' ] = false;
 			}
 		} else {
 			$response[ 'cscompanion_lock_notice' ] = false;
 
-			// Let's also delete the options
+			// Let's also delete the options if there is no lock
 			$this->clear_options( true );
 		}
 
@@ -556,7 +572,13 @@ class EditLock {
 
 		$has_taken_over = $this->has_someone_taken_over();
 		$locked = $this->check_lock_all_cornerstone_editors();
-		if ( $locked && !$has_taken_over ) {
+		$locked_post_id = isset( $locked[ 'post' ] ) ? $locked[ 'post' ] : 0;
+		$same_page = $locked_post_id && $locked_post_id == $post_id;
+		$global_lock = $this->should_lock_editor_globally();
+
+		if ( $locked && !$has_taken_over && ( $same_page || $global_lock ) ) {
+			$locked_post_id = isset( $locked[ 'post' ] ) ? $locked[ 'post' ] : 0;
+			$same_page = $locked_post_id && $locked_post_id == $post_id;
 
 			$locked_user_id = isset( $locked[ 'user' ] ) ? $locked[ 'user' ] : 0;
 			if ( $locked_user_id ) {
@@ -566,45 +588,53 @@ class EditLock {
 				$display_name = __( 'Another user', 'cornerstone-companion' );
 			}
 
-			$locked_post_id = isset( $locked[ 'post' ] ) ? $locked[ 'post' ] : 0;
-			if ( $locked_post_id ) {
-				$post_title = get_the_title( $locked_post_id );
-			} else {
-				$post_title = __( 'another post', 'cornerstone-companion' );
-			}
-			
-			$message = sprintf(
-				/* translators: %s = user display name */
-				__( '%s is currently editing a page in Cornerstone.', 'cornerstone-companion' ),
-				$display_name
-			);
-
-			if ( $post_title ) {
-				$message .= ' ' . sprintf(
-					/* translators: %s = post title */
-					__( 'The post being edited is titled "%s".', 'cornerstone-companion' ),
-					$post_title
+			if ( $same_page ) {
+				$message = sprintf(
+					/* translators: %s = user display name */
+					__( '%s is currently editing this page. You can take over editing, but doing so will kick them out.', 'cornerstone-companion' ),
+					$display_name
 				);
-			}
 
-			$message .= ' ' . __( 'Editing at the same time can result in global CSS and JS being overwritten if both users make changes and save independently.', 'cornerstone-companion' );
+			} else {
+				if ( $locked_post_id ) {
+					$post_title = get_the_title( $locked_post_id );
+				} else {
+					$post_title = __( 'another page', 'cornerstone-companion' );
+				}
+				
+				$message = sprintf(
+					/* translators: %s = user display name */
+					__( '%s is currently editing a page in Cornerstone.', 'cornerstone-companion' ),
+					$display_name
+				);
+
+				if ( $post_title ) {
+					$message .= ' ' . sprintf(
+						/* translators: %s = post title */
+						__( 'The page being edited is titled "%s".', 'cornerstone-companion' ),
+						$post_title
+					);
+				}
+
+				$message .= ' ' . __( 'Editing at the same time can result in global CSS and JS being overwritten if both users make changes and save independently.', 'cornerstone-companion' );
+			}
 
 			// Enqueue
 			$handle = 'cscompanion_edit_lock_takeover';
 			wp_enqueue_style( $handle, CSCOMPANION_CSS_URL . 'edit-lock-takeover.css', [], CSCOMPANION_VERSION );
 			wp_enqueue_script( $handle, CSCOMPANION_JS_URL . 'edit-lock-takeover.js', [ 'jquery' ], CSCOMPANION_VERSION, true );
 			wp_localize_script( $handle, $handle, [
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( $this->nonce ),
-				'action'   => $this->ajax_key_takeover,
-				'text'     => [
+				'ajax_url'  => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( $this->nonce ),
+				'action'    => $this->ajax_key_takeover,
+				'text'      => [
 					'message'          => $message,
 					'title'            => __( 'Cornerstone Editing Lock', 'cornerstone-companion' ),
 					'go_back'          => __( 'Go Back', 'cornerstone-companion' ),
 					'take_over'        => __( 'Take Over', 'cornerstone-companion' ),
 					'taking_over_btn'  => __( 'Taking over...', 'cornerstone-companion' ),
 					'taking_over_msg'  => __( 'Please wait while we ensure a smooth take over.', 'cornerstone-companion' ),
-					'confirm_takeover' => __( 'Warning: Taking over will forcibly disconnect the current user from Cornerstone editing. Are you sure you want to proceed?', 'cornerstone-companion' )
+					'confirm_takeover' => __( 'Warning: Taking over will forcibly disconnect the current user from Cornerstone editing. Are you sure you want to proceed?', 'cornerstone-companion' ),
 				]
 			] );
 

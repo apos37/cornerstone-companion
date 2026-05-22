@@ -1,7 +1,7 @@
 ( function( $ ) {
 	'use strict';
 
-	console.log( 'Stop! Cornerstone is already being edited.' );
+	console.log( 'Warning! Cornerstone is already being edited.' );
 
 	if ( typeof cscompanion_edit_lock_takeover === 'undefined' ) return;
 

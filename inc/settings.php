@@ -7,8 +7,8 @@
 /**
  * Define Namespaces
  */
-namespace Apos37\CornerstoneCompanion;
-use Apos37\CornerstoneCompanion\EditLock;
+namespace PluginRx\CornerstoneCompanion;
+use PluginRx\CornerstoneCompanion\EditLock;
 
 
 /**
@@ -81,6 +81,12 @@ class Settings {
         }
         ?>
 		<div class="wrap">
+			<h1><?php echo esc_html( CSCOMPANION_NAME ); ?></h1>
+			<?php
+			if ( isset( $_GET[ 'settings-updated' ] ) && $_GET[ 'settings-updated' ] === 'true' ) {
+				echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings updated successfully.', 'cornerstone-companion' ) . '</p></div>';
+			}
+			?>
 			<form method="post" action="options.php">
 				<?php settings_fields( $this->group ); ?>
 				<div class="cscompanion-settings-wrapper">
@@ -145,13 +151,32 @@ class Settings {
 				'default' 	=> true,
             ],
 			[ 
+				'section'   => 'general',
+				'type'      => 'checkbox',
+				'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'cscompanion_uninstall_cleanup',
+                'title'     => __( 'Cleanup on Uninstall', 'cornerstone-companion' ),
+				'desc'      => __( 'Deletes all plugin options when the plugin is uninstalled.', 'cornerstone-companion' ),
+				'default' 	=> false,
+            ],
+			[ 
 				'section'   => 'edit_lock',
 				'type'      => 'checkbox',
 				'sanitize'  => [ $this, 'sanitize_checkbox' ],
                 'key'       => 'cscompanion_enable_edit_lock',
                 'title'     => __( 'Enable Edit Lock', 'cornerstone-companion' ),
-				'desc'      => __( 'Prevents multiple users from editing the same post in Cornerstone at the same time by locking access to the editor.', 'cornerstone-companion' ),
+				'desc'      => __( 'Restricts simultaneous editing of the same post in Cornerstone. If one user is editing a post, others will be prevented from opening it in the editor until they are out.', 'cornerstone-companion' ),
 				'default' 	=> true,
+            ],
+			[ 
+				'section'   => 'edit_lock',
+				'type'      => 'checkbox',
+				'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'cscompanion_global_edit_lock',
+                'title'     => __( 'Lock Cornerstone Globally', 'cornerstone-companion' ),
+				'desc' => __( 'Prevents multiple users from accessing the Cornerstone editor at the same time, regardless of which post is being edited. This helps avoid conflicts when editing shared assets like Global CSS or JS, which can be unintentionally overwritten if more than one user is working in the editor simultaneously.', 'cornerstone-companion' ),
+				'default' 	=> false,
+				'conditions' => [ 'cscompanion_enable_edit_lock' ]
             ],
 			[ 
 				'section'   => 'edit_lock',
@@ -299,59 +324,6 @@ class Settings {
 	} // End settings_field_number()
 
 
-    // /**
-    //  * Custom callback function to print select field
-    //  *
-    //  * @param array $args
-    //  * @return void
-    //  */
-    // public function settings_field_select( $args ) {
-	// 	$default = isset( $args[ 'default' ] ) ? $args[ 'default' ] : '';
-	// 	$value   = sanitize_text_field( get_option( $args[ 'key' ], $default ) );
-
-	// 	if ( isset( $args[ 'revert' ] ) && $args[ 'revert' ] === true && trim( $value ) === '' ) {
-	// 		$value = $default;
-	// 	}
-
-	// 	printf(
-	// 		/* translators: %1$s is the select element ID and name attribute */
-	// 		'<select id="%1$s" name="%1$s">',
-	// 		esc_attr( $args[ 'key' ] )
-	// 	);
-
-	// 	if ( isset( $args[ 'options' ] ) ) {
-	// 		foreach ( $args[ 'options' ] as $key => $option ) {
-	// 			printf(
-	// 				/* translators: %1$s is the option value, %2$s is the selected attribute if matched, %3$s is the option label */
-	// 				'<option value="%1$s"%2$s>%3$s</option>',
-	// 				esc_attr( $key ),
-	// 				selected( $key, $value, false ),
-	// 				esc_html( $option )
-	// 			);
-	// 		}
-	// 	}
-
-	// 	echo '</select>';
-	// } // settings_field_select()
-
-
-    // /**
-    //  * Custom callback function to print textarea field
-    //  *
-    //  * @param array $args
-    //  * @return void
-    //  */
-    // public function settings_field_textarea( $args ) {
-	// 	$value = sanitize_textarea_field( get_option( $args[ 'key' ], $args[ 'default' ] ) );
-	// 	printf(
-	// 		/* translators: %1$s is the textarea ID and name attributes; %2$s is the escaped textarea content */
-	// 		'<textarea id="%1$s" name="%1$s">%2$s</textarea>',
-	// 		esc_attr( $args[ 'key' ] ),
-	// 		esc_html( $value )
-	// 	);
-	// } // End settings_field_textarea()
-
-
 	/**
      * Custom callback function to print checkbox field
      *
@@ -397,6 +369,7 @@ class Settings {
 	/**
      * Enqueue javascript
      *
+	 * @param string $hook The current admin page hook
      * @return void
      */
     public function enqueue_scripts( $hook ) {

@@ -3,10 +3,10 @@
  * Plugin Name:         Cornerstone Companion
  * Plugin URI:          https://github.com/apos37/cornerstone-companion
  * Description:         Enhance and extend the functionality of the Cornerstone website builder by Theme Co.
- * Version:             1.0.1
- * Requires at least:   5.9
- * Tested up to:        6.8
- * Requires PHP:        7.4
+ * Version:             1.0.2
+ * Requires at least:   6.0
+ * Tested up to:        7.0
+ * Requires PHP:        8.0
  * Author:              PluginRx
  * Author URI:          https://pluginrx.com/
  * Support URI:         https://discord.gg/3HnzNEJVnR
@@ -20,7 +20,7 @@
 /**
  * Define Namespace
  */
-namespace Apos37\CornerstoneCompanion;
+namespace PluginRx\CornerstoneCompanion;
 
 
 /**
@@ -69,6 +69,5 @@ require_once CSCOMPANION_INCLUDES_ABSPATH . 'helpers.php';
 require_once CSCOMPANION_INCLUDES_ABSPATH . 'scripts.php';
 require_once CSCOMPANION_INCLUDES_ABSPATH . 'misc.php';
 require_once CSCOMPANION_INCLUDES_ABSPATH . 'elements.php';
-require_once CSCOMPANION_INCLUDES_ABSPATH . 'themes.php';
 require_once CSCOMPANION_INCLUDES_ABSPATH . 'edit-lock.php';
 require_once CSCOMPANION_INCLUDES_ABSPATH . 'settings.php';
