@@ -4,7 +4,7 @@ Tags: cornerstone, theme co, enhancements, add-ons, extended
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -54,6 +54,16 @@ Yes, there are filter hooks and internal settings available to adjust the timeou
 Yes. The dashboard banner includes the timestamp of last activity (render event) so you can judge whether the session is stale.
 
 == Changelog ==
+= 1.0.3 =
+* New: Custom Icons library under the Media menu, allowing SVG icons to be uploaded and used in Cornerstone's icon elements.
+* New: Custom Icons are automatically hidden from the standard Media Library, but remain available in the Cornerstone icon element's Media source.
+* New: Host/spoke syncing lets one site act as a central icon library, with other sites pulling new or updated icons via a secure key.
+* New: Bulk upload and bulk delete support for Custom Icons.
+* Tweak: Custom Icons integrate with the native WordPress attachment editor for renaming and metadata.
+* Fix: Corrected an incorrect file path that caused a fatal error on plugin load.
+* Fix: Corrected a missing admin function call that caused a fatal error on front-end page loads.
+* Requires: The Safe SVG plugin (or equivalent) is recommended for SVG upload sanitization.
+
 = 1.0.2 =
 * Compatibility: Increased minimum required WordPress version to 6.0
 * Compatibility: Increased minimum required PHP version to 8.0

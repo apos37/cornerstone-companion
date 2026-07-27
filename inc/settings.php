@@ -118,6 +118,7 @@ class Settings {
 		$sections = [
 			'general'   => __( 'General', 'cornerstone-companion' ),
 			'edit_lock' => __( 'Edit Lock', 'cornerstone-companion' ),
+			'icons'     => __( 'Custom Icons', 'cornerstone-companion' ),
 		];
 
 		// Iter the sections
@@ -219,6 +220,54 @@ class Settings {
 				'default' 	=> (new EditLock())->autoboot_msg,
 				'conditions' => [ 'cscompanion_enable_edit_lock', 'cscompanion_edit_lock_enable_autoboot' ]
             ],
+			[
+				'section'   => 'icons',
+				'type'      => 'checkbox',
+				'sanitize'  => [ $this, 'sanitize_checkbox' ],
+				'key'       => 'cscompanion_icons_is_host',
+				'title'     => __( 'Act as Host', 'cornerstone-companion' ),
+				'desc'      => __( 'Allow other sites running Cornerstone Companion to sync icons from this site.', 'cornerstone-companion' ),
+				'default'   => false,
+			],
+			[
+				'section'   => 'icons',
+				'type'      => 'secret_key',
+				'sanitize'  => [ $this, 'sanitize_text_field' ],
+				'key'       => 'cscompanion_icons_secret_key',
+				'title'     => __( 'Secret Key', 'cornerstone-companion' ),
+				'desc'      => __( 'Share this key with spoke sites so they can authenticate when syncing icons from this site.', 'cornerstone-companion' ),
+				'default'   => '',
+				'conditions' => [ 'cscompanion_icons_is_host' ],
+			],
+			[
+				'section'   => 'icons',
+				'type'      => 'text',
+				'sanitize'  => [ $this, 'sanitize_url_field' ],
+				'key'       => 'cscompanion_icons_remote_url',
+				'title'     => __( 'Remote Host URL', 'cornerstone-companion' ),
+				'desc'      => __( 'The full URL of the site hosting your master icon library.', 'cornerstone-companion' ),
+				'width'     => '100%',
+				'default'   => '',
+			],
+			[
+				'section'   => 'icons',
+				'type'      => 'text',
+				'sanitize'  => [ $this, 'sanitize_text_field' ],
+				'key'       => 'cscompanion_icons_remote_key',
+				'title'     => __( 'Remote Host Secret Key', 'cornerstone-companion' ),
+				'desc'      => __( 'The secret key provided by the remote host site.', 'cornerstone-companion' ),
+				'width'     => '100%',
+				'default'   => '',
+			],
+			[
+				'section'   => 'icons',
+				'type'      => 'sync_button',
+				'sanitize'  => '__return_empty_string',
+				'key'       => 'cscompanion_icons_sync_trigger',
+				'title'     => __( 'Sync Icons', 'cornerstone-companion' ),
+				'desc'      => __( 'Check the remote host for new or updated icons and import them.', 'cornerstone-companion' ),
+				'default'   => '',
+			],
 		];
 	} // End options()
 
@@ -367,6 +416,58 @@ class Settings {
 
 
 	/**
+	 * Custom callback function to print the secret key field with generate/regenerate, clear, and copy buttons
+	 *
+	 * @param array $args
+	 */
+	public function settings_field_secret_key( $args ) {
+		$value = sanitize_text_field( get_option( $args[ 'key' ], $args[ 'default' ] ) );
+		$has_key = !empty( $value );
+
+		printf(
+			/* translators: %1$s is the input ID and name, %2$s is the value, %3$s is the generate/regenerate button text, %4$s is the clear button text, %5$s is the copy button text */
+			'<input type="text" id="%1$s" name="%1$s" value="%2$s" style="width: 30rem; max-width: 30rem;" readonly="readonly" />
+			<button type="button" class="button cscompanion-regenerate-key" data-target="%1$s" data-has-key="%6$s">%3$s</button>
+			<button type="button" class="button cscompanion-clear-key" data-target="%1$s"%7$s>%4$s</button>
+			<button type="button" class="button cscompanion-copy-key" data-target="%1$s"%7$s>%5$s</button>
+			<span class="spinner cscompanion-key-spinner" style="float:none;"></span>',
+			esc_attr( $args[ 'key' ] ),
+			esc_html( $value ),
+			$has_key ? esc_html__( 'Regenerate Key', 'cornerstone-companion' ) : esc_html__( 'Generate Key', 'cornerstone-companion' ),
+			esc_html__( 'Clear', 'cornerstone-companion' ),
+			esc_html__( 'Copy', 'cornerstone-companion' ),
+			$has_key ? 'true' : 'false',
+			$has_key ? '' : ' disabled="disabled"'
+		);
+	} // End settings_field_secret_key()
+
+
+	/**
+	 * Custom callback function to print the sync button and results area
+	 *
+	 * @param array $args
+	 */
+	public function settings_field_sync_button( $args ) {
+		printf(
+			'<button type="button" class="button button-primary" id="cscompanion-sync-icons" disabled="disabled">%1$s</button>
+			<div id="cscompanion-sync-status"></div>',
+			esc_html__( 'Check for New Icons', 'cornerstone-companion' )
+		);
+	} // End settings_field_sync_button()
+
+
+	/**
+	 * Sanitize a URL field
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	public function sanitize_url_field( $value ) {
+		return esc_url_raw( trim( $value ) );
+	} // End sanitize_url_field()
+
+
+	/**
      * Enqueue javascript
      *
 	 * @param string $hook The current admin page hook
@@ -399,6 +500,39 @@ class Settings {
 
 		// CSS
 		wp_enqueue_style( CSCOMPANION_TEXTDOMAIN . '-styles', CSCOMPANION_CSS_URL . 'settings.css', [], CSCOMPANION_VERSION );
+
+		// Icons sync JS
+		$icons_handle = 'cscompanion_icons_settings';
+		wp_enqueue_script( $icons_handle, CSCOMPANION_JS_URL . 'icons-settings.js', [ 'jquery' ], CSCOMPANION_VERSION, true );
+		wp_localize_script( $icons_handle, $icons_handle, [
+			'ajax_url'          => admin_url( 'admin-ajax.php' ),
+			'nonce'             => wp_create_nonce( 'cscompanion_icons_nonce' ),
+			'action_check'      => 'cscompanion_icons_check',
+			'action_import'     => 'cscompanion_icons_import_one',
+			'action_regenerate' => 'cscompanion_regenerate_key',
+			'action_clear'      => 'cscompanion_clear_key',
+			'saved_remote_url'  => get_option( 'cscompanion_icons_remote_url', '' ),
+			'saved_remote_key'  => get_option( 'cscompanion_icons_remote_key', '' ),
+			'text'              => [
+				'checking'           => __( 'Checking for new icons...', 'cornerstone-companion' ),
+				'none_found'         => __( 'No new icons found. You\'re up to date!', 'cornerstone-companion' ),
+				'found_prompt'       => __( '%d new or updated icons found. Import now?', 'cornerstone-companion' ),
+				'yes'                => __( 'Yes', 'cornerstone-companion' ),
+				'no'                 => __( 'No', 'cornerstone-companion' ),
+				'importing_batch'    => __( 'Imported %1$d of %2$d icons...', 'cornerstone-companion' ),
+				'done'               => __( '%d icons successfully imported!', 'cornerstone-companion' ),
+				'done_with_errors'   => __( '%1$d icons imported, %2$d failed. Check the error log for details.', 'cornerstone-companion' ),
+				'error'              => __( 'Something went wrong. Please try again.', 'cornerstone-companion' ),
+				'key_regenerated'    => __( 'A new secret key was saved.', 'cornerstone-companion' ),
+				'confirm_regenerate' => __( 'This will invalidate the current key. Any spoke sites using it will need updating. Continue?', 'cornerstone-companion' ),
+				'copied'             => __( 'Copied!', 'cornerstone-companion' ),
+				'confirm_clear'      => __( 'This will remove the current key. Any spoke sites using it will stop working until you generate a new one and update them. Continue?', 'cornerstone-companion' ),
+				'save_first'         => __( 'Save changes before syncing', 'cornerstone-companion' ),
+				'check_icons'        => __( 'Check for New Icons', 'cornerstone-companion' ),
+				'generate_label'     => __( 'Generate Key', 'cornerstone-companion' ),
+				'regenerate_label'   => __( 'Regenerate Key', 'cornerstone-companion' ),
+			],
+		] );
     } // End enqueue_scripts()
 
 }

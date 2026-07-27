@@ -22,7 +22,7 @@ class Common {
 		$this->check_cornerstone_dependency();
 
 		// Check for updates
-		add_action( 'plugins_loaded', [ $this, 'check_for_updates' ] );
+		// add_action( 'plugins_loaded', [ $this, 'check_for_updates' ] );
         
     } // End __construct()
 
@@ -58,6 +58,9 @@ class Common {
 	 * @return void
 	 */
 	public function check_cornerstone_dependency() {
+		if ( !function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
 		$has_plugin = is_plugin_active( 'cornerstone/cornerstone.php' );
 		$theme      = wp_get_theme();
 		$parent     = $theme->parent();

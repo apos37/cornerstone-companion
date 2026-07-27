@@ -1,0 +1,73 @@
+/* Icon Library Admin Page */
+.cscompanion-icons-upload-box {
+	background-color: #fff;
+	box-shadow: 0 1px 4px #0000001a;
+	padding: 1.5em;
+	margin: 1.5em 0;
+	max-width: 40em;
+}
+
+.cscompanion-icons-upload-box h2 {
+	margin-top: 0;
+}
+
+.cscompanion-icons-upload-box input[type="text"] {
+	width: 100%;
+	max-width: 30em;
+	padding: .5em;
+}
+
+.cscompanion-icons-upload-box input[type="file"] {
+	padding: .5em 0;
+}
+
+.cscompanion-key-spinner {
+	visibility: hidden;
+	margin-top: 4px;
+}
+
+.cscompanion-key-spinner.is-active {
+	visibility: visible;
+}
+
+/* Sync Status Notices */
+#cscompanion-sync-status .notice {
+	background: #fff;
+	border-left: 4px solid #72aee6;
+	padding: 1em;
+}
+
+#cscompanion-sync-status .notice-success {
+	border-left-color: #00a32a;
+}
+
+#cscompanion-sync-status .notice-error {
+	border-left-color: #d63638;
+}
+
+#cscompanion-sync-status .notice-warning {
+	border-left-color: #dba617;
+}
+
+#cscompanion-sync-status .notice p {
+	display: flex;
+	align-items: center;
+	gap: .5em;
+	margin: .5em 0;
+}
+
+#cscompanion-sync-status .spinner {
+	float: none;
+	margin: 0;
+}
+
+/* Icon Table */
+.wp-list-table .column-preview {
+	width: 60px;
+}
+
+.wp-list-table td svg {
+	width: 32px;
+	height: 32px;
+	display: block;
+}
